@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Financial Analysis & Strategy Dashboard</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ApexCharts for interactive charts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom styles for the dashboard -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark gray-blue background */
+            color: #e5e7eb;
+        }
+        .dashboard-card {
+            background-color: #1F2937;
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        .news-feed::-webkit-scrollbar { width: 4px; }
+        .news-feed::-webkit-scrollbar-track { background: #1F2937; }
+        .news-feed::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 2px; }
+        .apexcharts-tooltip {
+            background: #374151 !important;
+            color: #e5e7eb !important;
+            border: 1px solid #4B5563 !important;
+        }
+        .buy-signal-text { color: #22c55e; text-shadow: 0 0 5px #22c55e; }
+        .sell-signal-text { color: #ef4444; text-shadow: 0 0 5px #ef4444; }
+        .hold-signal-text { color: #f59e0b; }
+    </style>
+</head>
+<body class="p-4 lg:p-6">
+
+    <div class="max-w-screen-2xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-bold text-white">AI Financial Analysis & Strategy Dashboard</h1>
+                <p class="text-sm text-gray-400">Model Performance, Risk Analytics, and Signal Interpretation</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                 <div class="flex items-center space-x-3 bg-gray-700/50 text-gray-300 border border-gray-600 rounded-full px-4 py-2">
+                    <span class="font-semibold text-sm">Asset: TECH.AI (Simulated)</span>
+                </div>
+                <div class="flex items-center space-x-3 bg-green-900/50 text-green-300 border border-green-600 rounded-full px-4 py-2">
+                    <div class="live-indicator"></div>
+                    <span class="font-semibold text-sm">LIVE ANALYSIS</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+
+            <!-- Main Content Area (Charts) -->
+            <div class="xl:col-span-3 flex flex-col gap-6">
+                <!-- Top Row: Price and Performance Analytics -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                     <div class="dashboard-card p-4 md:col-span-3">
+                        <h2 class="text-lg font-semibold text-white mb-2">Market Price (5min Intervals)</h2>
+                        <div id="price-chart" class="w-full"></div>
+                    </div>
+                    <div class="dashboard-card p-4 md:col-span-2">
+                         <h2 class="text-lg font-semibold text-white mb-2">Strategy Performance Analytics</h2>
+                         <div id="pnl-chart" class="w-full -mt-4 -mb-4"></div>
+                         <div class="grid grid-cols-3 gap-2 text-center mt-2 border-t border-gray-700 pt-2">
+                             <div>
+                                 <h4 class="text-xs text-gray-400">Sharpe Ratio</h4>
+                                 <p id="sharpe-ratio" class="font-bold text-lg text-white">1.82</p>
+                             </div>
+                              <div>
+                                 <h4 class="text-xs text-gray-400">Max Drawdown</h4>
+                                 <p id="max-drawdown" class="font-bold text-lg text-red-500">-12.4%</p>
+                             </div>
+                              <div>
+                                 <h4 class="text-xs text-gray-400">Win/Loss Ratio</h4>
+                                 <p id="win-loss-ratio" class="font-bold text-lg text-green-500">2.1 : 1</p>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: AI Model Outputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="dashboard-card p-4">
+                        <h2 class="text-lg font-semibold text-white mb-2">NLP News Sentiment Analysis</h2>
+                        <div id="sentiment-chart"></div>
+                    </div>
+                    <div class="dashboard-card p-4">
+                        <h2 class="text-lg font-semibold text-white mb-2">GARCH Volatility Forecast (Risk)</h2>
+                        <div id="volatility-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar (KPIs, News & Strategy) -->
+            <div class="xl:col-span-1 flex flex-col gap-6">
+                <div class="dashboard-card p-4">
+                     <h3 class="text-gray-400 text-sm font-medium mb-2">AI Recommendation</h3>
+                     <p id="ai-signal" class="text-4xl font-bold hold-signal-text mb-1">HOLD</p>
+                     <p id="signal-driver" class="text-xs text-gray-400 mb-3">Drivers: Neutral market conditions</p>
+                     <div class="text-sm">
+                         <span class="text-gray-400">Model Confidence:</span>
+                         <span id="model-confidence" class="font-bold text-white">85%</span>
+                     </div>
+                </div>
+                 <div class="dashboard-card p-4 grid grid-cols-2 gap-4 text-center">
+                      <div>
+                            <h3 class="text-gray-400 text-sm font-medium">Current Price</h3>
+                            <p id="current-price" class="text-2xl font-bold text-white">$0.00</p>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-medium">Data Latency</h3>
+                            <p id="data-latency" class="text-2xl font-bold text-cyan-400">0ms</p>
+                        </div>
+                 </div>
+                 <div class="dashboard-card p-4 flex flex-col flex-grow">
+                    <h2 class="text-lg font-semibold text-white mb-3">Live News Feed (Analyzed)</h2>
+                    <div id="news-feed" class="news-feed flex-grow overflow-y-auto pr-2 space-y-3 h-64">
+                        <!-- News items will be injected here -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <h3 class="text-md font-semibold text-white mb-2">Model Decision Logic</h3>
+                        <ul class="text-xs text-gray-300 space-y-1">
+                            <li><strong class="text-green-400">BUY:</strong> High Positive Sentiment AND Low Predicted Volatility.</li>
+                            <li><strong class="text-red-400">SELL:</strong> High Negative Sentiment OR High Predicted Volatility.</li>
+                            <li><strong class="text-yellow-400">HOLD:</strong> Neutral conditions; wait for a clear trend.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Configuration ---
+            const UPDATE_INTERVAL = 2500; // ms
+            const MAX_DATA_POINTS = 50;
+            let lastPrice = 150.00;
+            let lastTimestamp = new Date().getTime() - MAX_DATA_POINTS * 5 * 60 * 1000;
+            let lastPnl = 1000;
+            let position = null; // null, 'long'
+            let entryPrice = 0;
+            
+            // --- Mock Data ---
+            const newsHeadlines = {
+                positive: ["Breakthrough in AI efficiency", "Positive earnings surprise expected", "New partnership with industry giant", "Regulators approve key technology", "Analyst upgrades stock to 'Strong Buy'"],
+                negative: ["Data breach concerns send shockwaves", "CEO under investigation", "Misses earnings estimates", "Competitor launches a superior product", "Global supply chain issues impact"],
+                neutral: ["Market awaits Fed decision", "To present at industry conference", "Sector-wide consolidation continues", "Announces routine software update", "Trading volume remains stable"]
+            };
+
+            // --- State & Chart Instances ---
+            let priceData = [], sentimentData = [], volatilityData = [], pnlData = [];
+            let priceChart, sentimentChart, volatilityChart, pnlChart;
+
+            // --- UI Elements ---
+            const currentPriceEl = document.getElementById('current-price');
+            const dataLatencyEl = document.getElementById('data-latency');
+            const aiSignalEl = document.getElementById('ai-signal');
+            const signalDriverEl = document.getElementById('signal-driver');
+            const modelConfidenceEl = document.getElementById('model-confidence');
+            const newsFeedEl = document.getElementById('news-feed');
+
+            // --- Chart Options ---
+            const commonOptions = {
+                chart: { toolbar: { show: false }, animations: { easing: 'easeinout', speed: 600 }, background: 'transparent' },
+                stroke: { width: 2, curve: 'smooth' },
+                grid: { borderColor: '#374151', strokeDashArray: 3 },
+                xaxis: { type: 'datetime', labels: { style: { colors: '#9CA3AF' } } },
+                yaxis: { labels: { style: { colors: '#9CA3AF' } } },
+                tooltip: { theme: 'dark', x: { format: 'dd MMM HH:mm' } },
+                legend: { labels: { colors: '#D1D5DB' } }
+            };
+
+            function generateInitialData() {
+                for (let i = 0; i < MAX_DATA_POINTS; i++) {
+                   generateNextDataPoint();
+                }
+            }
+            
+            function generateNextDataPoint() {
+                const newTimestamp = lastTimestamp + 5 * 60 * 1000;
+                lastTimestamp = newTimestamp;
+                
+                // Simulate Price
+                const open = lastPrice;
+                const change = (Math.random() - 0.49) * (lastPrice * 0.01);
+                const close = open + change;
+                const high = Math.max(open, close) + Math.random() * (lastPrice * 0.005);
+                const low = Math.min(open, close) - Math.random() * (lastPrice * 0.005);
+                lastPrice = close;
+                priceData.push({ x: newTimestamp, y: [open, high, low, close] });
+
+                // Simulate Sentiment & Volatility
+                const sentiment = Math.random() * 2 - 1; // -1 to 1
+                const volatility = Math.random() * 0.6 + 0.1; // 0.1 to 0.7
+                sentimentData.push({ x: newTimestamp, y: sentiment.toFixed(2) });
+                volatilityData.push({ x: newTimestamp, y: volatility.toFixed(2) });
+
+                // Simulate P&L
+                if (position === 'long') {
+                    lastPnl += (close - entryPrice) * 10; // 10 shares
+                    entryPrice = close;
+                }
+                pnlData.push({ x: newTimestamp, y: lastPnl.toFixed(2) });
+
+
+                if (priceData.length > MAX_DATA_POINTS) {
+                    priceData.shift(); sentimentData.shift(); volatilityData.shift(); pnlData.shift();
+                }
+
+                return { price: close, sentiment, volatility };
+            }
+            
+            function updateDashboard() {
+                const { price, sentiment, volatility } = generateNextDataPoint();
+                const startTime = performance.now();
+
+                // Update charts
+                priceChart.updateSeries([{ data: priceData }]);
+                sentimentChart.updateSeries([{ data: sentimentData }]);
+                volatilityChart.updateSeries([{ data: volatilityData }]);
+                pnlChart.updateSeries([{ data: pnlData }]);
+                
+                // Update KPIs
+                currentPriceEl.textContent = `$${price.toFixed(2)}`;
+
+                // AI Signal Logic
+                let signal = 'HOLD', signalClass = 'hold-signal-text', driver = 'Neutral market conditions';
+                if (sentiment > 0.7 && volatility < 0.25) {
+                    signal = 'BUY'; signalClass = 'buy-signal-text'; driver = 'High positive sentiment, low risk';
+                    if (position !== 'long') { 
+                        position = 'long'; 
+                        entryPrice = price; 
+                        addSignalAnnotation(lastTimestamp, price, true);
+                    }
+                } else if (sentiment < -0.6 || volatility > 0.6) {
+                    signal = 'SELL'; signalClass = 'sell-signal-text'; driver = sentiment < -0.6 ? 'High negative sentiment' : 'High predicted risk';
+                     if (position === 'long') { 
+                        position = null; 
+                        addSignalAnnotation(lastTimestamp, price, false);
+                    }
+                }
+                aiSignalEl.textContent = signal;
+                aiSignalEl.className = `text-4xl font-bold ${signalClass}`;
+                signalDriverEl.textContent = `Drivers: ${driver}`;
+                modelConfidenceEl.textContent = `${Math.floor(Math.random() * 15) + 85}%`;
+
+                // Update News Feed & Latency
+                addNewsItem(sentiment);
+                const endTime = performance.now();
+                dataLatencyEl.textContent = `${Math.round(endTime - startTime + Math.random() * 50)}ms`;
+            }
+
+            function addSignalAnnotation(timestamp, price, isBuy) {
+                 priceChart.addPointAnnotation({ x: timestamp, y: price, marker: { size: 6, fillColor: '#fff', strokeColor: isBuy ? '#22c55e' : '#ef4444', strokeWidth: 3, shape: 'circle', radius: 2, }, label: { borderColor: isBuy ? '#22c55e' : '#ef4444', offsetY: isBuy ? 25 : -25, style: { color: '#111827', background: isBuy ? '#22c55e' : '#ef4444', }, text: isBuy ? 'BUY' : 'SELL', } });
+            }
+
+            function addNewsItem(sentiment) {
+                let category, headline, colorClass;
+                if (sentiment > 0.5) { category = 'positive'; colorClass = 'border-green-500'; } 
+                else if (sentiment < -0.4) { category = 'negative'; colorClass = 'border-red-500'; } 
+                else { category = 'neutral'; colorClass = 'border-gray-500'; }
+                headline = newsHeadlines[category][Math.floor(Math.random() * newsHeadlines[category].length)];
+                const newsItem = document.createElement('div');
+                newsItem.className = `p-2.5 border-l-4 rounded-r-md text-xs bg-gray-800/50 ${colorClass}`;
+                newsItem.innerHTML = `<div class="flex justify-between items-center mb-1"><span class="font-bold uppercase ${category === 'positive' ? 'text-green-400' : category === 'negative' ? 'text-red-400' : 'text-yellow-400'}">${category}</span><span class="font-mono text-gray-500">${new Date(lastTimestamp).toLocaleTimeString()}</span></div><p class="text-gray-300">${headline}</p>`;
+                newsFeedEl.prepend(newsItem);
+                if (newsFeedEl.children.length > 20) { newsFeedEl.lastChild.remove(); }
+            }
+
+            function initializeCharts() {
+                // Price Chart
+                const priceChartOptions = { ...commonOptions, series: [{ data: priceData }], chart: { ...commonOptions.chart, type: 'candlestick', height: 250 }, yaxis: { ...commonOptions.yaxis, tooltip: { enabled: true }, labels: { formatter: (val) => `$${val.toFixed(2)}` } }, tooltip: { ...commonOptions.tooltip, shared: true, custom: ({series, seriesIndex, dataPointIndex, w}) => `<div class="p-2"><div><strong>Open:</strong> $${w.globals.seriesCandleO[seriesIndex][dataPointIndex].toFixed(2)}</div><div><strong>High:</strong> $${w.globals.seriesCandleH[seriesIndex][dataPointIndex].toFixed(2)}</div><div><strong>Low:</strong> $${w.globals.seriesCandleL[seriesIndex][dataPointIndex].toFixed(2)}</div><div><strong>Close:</strong> $${w.globals.seriesCandleC[seriesIndex][dataPointIndex].toFixed(2)}</div></div>`}, plotOptions: { candlestick: { colors: { upward: '#10B981', downward: '#EF4444' } } }};
+                priceChart = new ApexCharts(document.querySelector("#price-chart"), priceChartOptions);
+                priceChart.render();
+                
+                // P&L Chart
+                const pnlChartOptions = { ...commonOptions, series: [{name: 'P&L', data: pnlData}], chart: { ...commonOptions.chart, type: 'area', height: 160, sparkline: { enabled: true }}, colors: ['#38bdf8'], tooltip: { ...commonOptions.tooltip, y: { formatter: val => `$${val}`}} };
+                pnlChart = new ApexCharts(document.querySelector("#pnl-chart"), pnlChartOptions);
+                pnlChart.render();
+                
+                // Sentiment Chart
+                const sentimentChartOptions = { ...commonOptions, series: [{ name: 'Sentiment', data: sentimentData }], chart: { ...commonOptions.chart, type: 'area', height: 200 }, colors: ['#3B82F6'], yaxis: { ...commonOptions.yaxis, min: -1, max: 1 }, annotations: { yaxis: [{ y: 0.7, borderColor: '#22c55e', label: { text: 'Strong Buy', style: { background: '#22c55e' } } }, { y: -0.6, borderColor: '#ef4444', label: { text: 'Strong Sell', style: { background: '#ef4444' } } }] }, dataLabels: { enabled: false } };
+                sentimentChart = new ApexCharts(document.querySelector("#sentiment-chart"), sentimentChartOptions);
+                sentimentChart.render();
+                
+                // Volatility Chart
+                const volatilityChartOptions = { ...commonOptions, series: [{ name: 'Volatility', data: volatilityData }], chart: { ...commonOptions.chart, type: 'line', height: 200 }, colors: ['#F59E0B'], yaxis: { ...commonOptions.yaxis, min: 0, max: 1 }, annotations: { yaxis: [{ y: 0.6, borderColor: '#ef4444', label: { text: 'High Risk', style: { background: '#ef4444' } } }] }, dataLabels: { enabled: false } };
+                volatilityChart = new ApexCharts(document.querySelector("#volatility-chart"), volatilityChartOptions);
+                volatilityChart.render();
+            }
+
+            // --- Initialization ---
+            generateInitialData();
+            initializeCharts();
+            setInterval(updateDashboard, UPDATE_INTERVAL);
+        });
+    </script>
+</body>
+</html>
+
